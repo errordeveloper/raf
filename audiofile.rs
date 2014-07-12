@@ -1,6 +1,8 @@
 extern crate libc;
 extern crate std;
 
+use std::result::Result;
+
 #[allow(dead_code,
         unused_attribute,
         uppercase_variables,
@@ -9,7 +11,8 @@ extern crate std;
 
 mod afapi;
 
-fn open(name: &str, mode: &str) -> afapi::AFfilehandle {
+
+fn do_open(name: &str, mode: &str) -> afapi::AFfilehandle {
   name.with_c_str(|name|
     mode.with_c_str(|mode|
       unsafe {
@@ -18,7 +21,7 @@ fn open(name: &str, mode: &str) -> afapi::AFfilehandle {
   ))
 }
 
-fn close(file: afapi::AFfilehandle) -> i32 {
+fn do_close(file: afapi::AFfilehandle) -> i32 {
   unsafe {
     afapi::afCloseFile(file)
   }
@@ -79,11 +82,31 @@ fn get_frame_count(file: afapi::AFfilehandle) -> i64 {
 
 fn with_readonly(path: &str, block: |handle: afapi::AFfilehandle|) {
 
-  let file = open(path, "r");
+  let file = do_open(path, "r");
 
   block(file);
 
-  close(file); // TODO: make sure this closes it on failure too
+  do_close(file); // TODO: make sure this closes it on failure too
+}
+
+pub struct AudioFile {
+  handle: afapi::AFfilehandle,
+}
+
+impl AudioFile {
+  pub fn open(path: &str, mode: &str) -> Result<AudioFile, ()> {
+    let file = do_open(path, mode);
+    //let null:afapi::AFfilehandle = 0 as afapi::AFfilehandle;
+    match file {
+      _  => Ok(AudioFile{ handle: file }),
+    }
+  }
+  pub fn close(&self) -> Result<(), ()> {
+    match do_close(self.handle) {
+      0 => Ok(()),
+      _ => Err(()),
+    }
+  }
 }
 
 #[cfg(test)]
@@ -245,7 +268,16 @@ mod test {
 
   #[test]
   fn should_fail_to_open_dev_null() {
-    assert_eq!(::open("/dev/null", "r"), 0 as ::afapi::AFfilehandle);
+    assert_eq!(::do_open("/dev/null", "r"), 0 as ::afapi::AFfilehandle);
+  }
+
+  #[test]
+  fn struct_version_open_and_clonse() {
+    match ::AudioFile::open(path[2], "r") {
+      Err(v) => fail!("Shouldn't have happened!"),
+       Ok(v) => { v.close(); },
+    }
+    let f = ::AudioFile::open("/dev/null", "r");
   }
 
 }
