@@ -1,2 +1,5 @@
 .*.sw?
 bin/*
+bindgen
+*.dylib
+audiofile_test
