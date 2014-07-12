@@ -3,3 +3,4 @@ bin/*
 bindgen
 *.dylib
 audiofile_test
+imports/audiofile-test-media
