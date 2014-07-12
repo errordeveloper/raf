@@ -108,7 +108,7 @@ mod test {
   ];
 
   #[test]
-  fn open_and_get_basic_info() {
+  fn open_and_get_basic_info_with_low_level_calls() {
     ::with_readonly(path[0], |file| {
       assert_eq!(::get_format(file), ::afapi::AF_FILE_NEXTSND);
       assert_eq!(::get_channels(file), 1);
@@ -242,4 +242,10 @@ mod test {
       assert_eq!(::get_frame_count(file), 102212);
     });
   }
+
+  #[test]
+  fn should_fail_to_open_dev_null() {
+    assert_eq!(::open("/dev/null", "r"), 0 as ::afapi::AFfilehandle);
+  }
+
 }
