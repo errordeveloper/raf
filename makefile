@@ -1,5 +1,10 @@
 LIBAUDIOFILE ?= -L$(shell brew --prefix)/opt/audiofile/lib/ #libaudiofile.a
-RUSTFLAGS += -C link-args=$(LIBAUDIOFILE)
+RUSTFLAGS += -C link-args="$(LIBAUDIOFILE)"
+
+test:
+	@mkdir -p bin
+	rustc $(RUSTFLAGS) --cfg test audiofile.rs -o bin/test
+	bin/test
 
 all: bin/printinfo
 
