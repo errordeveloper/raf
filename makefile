@@ -1,13 +1,26 @@
-LIBAUDIOFILE ?= -L$(shell brew --prefix)/opt/audiofile/lib/ #libaudiofile.a
-RUSTFLAGS += -C link-args="$(LIBAUDIOFILE)"
+LIBCLANG	?= "-L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/"
+
+LIBAUDIOFILE	?= -L$(shell brew --prefix)/opt/audiofile/lib/ -laudiofile
+
+RUSTFLAGS	+= -C link-args="$(LIBAUDIOFILE)"
 
 test:
-	@mkdir -p bin
-	rustc $(RUSTFLAGS) --cfg test audiofile.rs -o bin/test
-	bin/test
+	rustc $(RUSTFLAGS) --cfg test audiofile.rs -o ./audiofile_test
+	./audiofile_test
 
-all: bin/printinfo
+regen:
+	rm -f afapi.rs
+	$(MAKE) afapi.rs
 
-bin/%: utils/%.rs
-	@mkdir -p bin
-	rustc $(RUSTFLAGS) $< -o $@
+bindgen:
+	rustc imports/rust-bindgen/lib.rs -C link-args="$(LIBCLANG)"
+	rustc imports/rust-bindgen/bindgen.rs -L . -C link-args="$(LIBCLANG)"
+
+afapi.rs: bindgen
+	./$< imports/audiofile/libaudiofile/audiofile.h \
+		-I imports/audiofile/libaudiofile/ \
+		-match audiofile.h \
+		-match aupvlist.h \
+		| sed 's/off_t/::libc::off_t/' \
+		| sed 's/\(^pub static .*: ::libc::c_\)u\(int = [0-9]*;$$\)/\1\2 \/\*_patched_\*\//' \
+	> $@
