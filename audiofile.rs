@@ -26,29 +26,23 @@ fn close(file: afapi::AFfilehandle) -> i32 {
 
 fn get_format(file: afapi::AFfilehandle) -> i32 {
   unsafe {
-    afapi::afGetFileFormat(file, 0 as *mut i32) as i32
+    afapi::afGetFileFormat(file, &mut 0) as i32
   }
 }
 
 fn get_track_ids(file: afapi::AFfilehandle) -> i32 {
-  let track_ids: ::libc::c_int = 0;
-  let track_ids_ptr = track_ids as *mut ::libc::c_int;
+  let mut track_ids = 0;
   unsafe {
-    let err = afapi::afGetTrackIDs(file, track_ids_ptr);
+    let err = afapi::afGetTrackIDs(file, &mut track_ids);
   }
   return track_ids;
 }
 
 fn get_sample_format(file: afapi::AFfilehandle) -> (i32, i32) {
-
-  let (format, width):
-    (::libc::c_int, ::libc::c_int) = (0, 0);
-  let (format_ptr, width_ptr) =
-    (format as *mut ::libc::c_int, width as *mut ::libc::c_int);
-
+  let (mut format, mut width) = (0, 0);
   unsafe {
     let err = afapi::afGetSampleFormat(file,
-        afapi::AF_DEFAULT_TRACK as ::libc::c_int, format_ptr, width_ptr);
+        afapi::AF_DEFAULT_TRACK as ::libc::c_int, &mut format, &mut width);
   }
   return (format, width);
 }
@@ -65,7 +59,7 @@ fn with_readonly(path: &str, block: |handle: afapi::AFfilehandle|) {
 
   block(file);
 
-  close(file);
+  close(file); // TODO: make sure this closes it on failure too
 }
 
 #[cfg(test)]
@@ -82,21 +76,22 @@ mod test {
       assert!(::get_format(file)
               == ::afapi::AF_FILE_NEXTSND);
       assert!(::get_track_ids(file)
-              == 0);
+              != 0);
       assert!(::get_channels(file)
               == 1);
-      //let (format, width) = ::get_sample_format(file);
-      ////16-bit integer (2's complement, big endian)
-      //fail!("format={} width={}", format, width);
-      //assert!(format
-      //        == ::afapi::AF_SAMPFMT_TWOSCOMP);
-      //assert!(width
-      //        == ::afapi::AF_BYTEORDER_BIGENDIAN);
+      let (format, width) = ::get_sample_format(file);
+      assert!(format
+              == ::afapi::AF_SAMPFMT_TWOSCOMP);
+      assert!(width
+              == 16);
     });
     ::with_readonly(path[1], |file| {
       assert!(::get_channels(file) == 2);
-      //let (format, width) = ::get_sample_format(file);
-      //fail!("format={} width={}", format, width);
+      let (format, width) = ::get_sample_format(file);
+      assert!(format
+              == ::afapi::AF_SAMPFMT_FLOAT);
+      assert!(width
+              == 32);
     });
   }
 }
