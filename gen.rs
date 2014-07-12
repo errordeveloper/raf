@@ -56,7 +56,7 @@ impl __mbstate_t {
 pub type __darwin_mbstate_t = __mbstate_t;
 pub type __darwin_ptrdiff_t = ::libc::c_long;
 pub type __darwin_size_t = ::libc::c_ulong;
-pub type __darwin_va_list = __builtin_va_list;
+//pub type __darwin_va_list = __builtin_va_list;
 pub type __darwin_wchar_t = ::libc::c_int;
 pub type __darwin_rune_t = __darwin_wchar_t;
 pub type __darwin_wint_t = ::libc::c_int;
