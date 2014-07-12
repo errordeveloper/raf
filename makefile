@@ -1,6 +1,14 @@
-LIBCLANG	?= "-L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/"
+HOST_OS := $(shell uname -s)
 
+ifeq ($(HOST_OS),Darwin)
+LIBCLANG	?= -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/
 LIBAUDIOFILE	?= -L$(shell brew --prefix)/opt/audiofile/lib/ -laudiofile
+endif
+
+ifeq ($(HOST_OS),Linux)
+LIBCLANG	?= -L/usr/lib/
+LIBAUDIOFILE	?= -L/usr/lib/ -laudiofile
+endif
 
 RUSTFLAGS	+= -C link-args="$(LIBAUDIOFILE)"
 

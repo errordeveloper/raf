@@ -13,4 +13,4 @@ before_script:
     - "rustc --version"
     - "(cd imports/; git clone -q https://github.com/mpruett/audiofile-test-media)"
 script:
-    - "/bin/true" #make # ah.. we need to test it on linux first
+    - "make test"
