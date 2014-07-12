@@ -493,7 +493,7 @@ pub static AF_ERR_BAD_AIFF_MARK: ::libc::c_uint = 3072;
 pub static AF_ERR_BAD_AIFF_SKIP: ::libc::c_uint = 3073;
 pub static AF_ERR_BAD_AIFF_LOOPMODE: ::libc::c_uint = 3074;
 #[link(name =
-           "/Users/ilya/Library/Local/Homebrew/opt/audiofile/lib/libaudiofile.a",
+           "audiofile",
        kind = "static")]
 extern "C" {
     pub fn AUpvnew(maxItems: ::libc::c_int) -> AUpvlist;
