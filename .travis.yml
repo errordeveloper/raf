@@ -1,0 +1,16 @@
+language: c
+compiler: clang
+before_install:
+    - "sudo apt-get -qq update"
+install:
+    - "sudo apt-get -qq install libaudiofile-dev libclang-dev"
+    - "curl --retry 3 --output rust.tgz 
+        http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz"
+    - "tar xv rust.tgz"
+before_script:
+    - "export LD_LIBRARY_PATH=${PWD}/rust-nightly-x86_64-unknown-linux-gnu/lib"
+    - "export PATH=${PWD}/rust-nightly-x86_64-unknown-linux-gnu/bin:${PATH}"
+    - "rustc --version"
+    - "(cd imports/; git clone -q https://github.com/mpruett/audiofile-test-media)"
+script:
+    - "/bin/true" #make # ah.. we need to test it on linux first
