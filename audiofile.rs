@@ -79,15 +79,24 @@ mod test {
               != 0);
       assert!(::get_channels(file)
               == 1);
+
       let (format, width) = ::get_sample_format(file);
+      // TODO:: replace this with pattern matching
       assert!(format
               == ::afapi::AF_SAMPFMT_TWOSCOMP);
       assert!(width
               == 16);
     });
     ::with_readonly(path[1], |file| {
-      assert!(::get_channels(file) == 2);
+      assert!(::get_format(file)
+              == ::afapi::AF_FILE_AIFFC);
+      assert!(::get_channels(file)
+              == 2);
+      assert!(::get_track_ids(file)
+              != 0);
+
       let (format, width) = ::get_sample_format(file);
+      // TODO:: replace this with pattern matching
       assert!(format
               == ::afapi::AF_SAMPFMT_FLOAT);
       assert!(width
