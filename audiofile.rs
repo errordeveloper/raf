@@ -1,7 +1,13 @@
+#![feature(phase)]
+#[phase(plugin, link)] extern crate log;
+
 extern crate libc;
 extern crate std;
 
-use std::result::Result;
+//use std::result::result;
+//use std::io::{file, fs};
+use native::io::file::open;
+use std::rt::rtio::{Open, Read};
 
 #[allow(dead_code,
         unused_attribute,
@@ -111,6 +117,9 @@ impl AudioFile {
 
 #[cfg(test)]
 mod test {
+
+  use native::io::file::open;
+  use std::rt::rtio::{Open, Read};
 
   // This is not everything but should be plenty
   static path: [&'static str, ..7] = [
@@ -268,16 +277,33 @@ mod test {
 
   #[test]
   fn should_fail_to_open_dev_null() {
+    // NOTE: this doesn't close it
     assert_eq!(::do_open("/dev/null", "r"), 0 as ::afapi::AFfilehandle);
   }
 
   #[test]
-  fn struct_version_open_and_clonse() {
-    match ::AudioFile::open(path[2], "r") {
-      Err(v) => fail!("Shouldn't have happened!"),
-       Ok(v) => { v.close(); },
-    }
-    let f = ::AudioFile::open("/dev/null", "r");
+  fn should_open_by_file_descriptor() {
+    let file1 =
+      match open(&path[3].to_c_str(), Open, Read) {
+        Err(_) => { fail!("Something is terribly wrong!"); },
+        Ok(f)  => { f },
+      };
+    assert!(file1.fd() > 2);
+    let file2 =
+      match open(&path[5].to_c_str(), Open, Read) {
+        Err(_) => { fail!("Something is terribly wrong!"); },
+        Ok(f)  => { f },
+      };
+    assert!(file2.fd() > 2);
   }
+
+  //#[test]
+  //fn struct_version_open_and_clonse() {
+  //  match ::AudioFile::open(path[2], "r") {
+  //    Err(v) => fail!("Shouldn't have happened!"),
+  //     Ok(v) => { v.close(); },
+  //  }
+  //  let f = ::AudioFile::open("/dev/null", "r");
+  //}
 
 }

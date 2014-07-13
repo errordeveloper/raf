@@ -10,7 +10,7 @@ LIBCLANG	?= -L/usr/lib/
 LIBAUDIOFILE	?= -L/usr/lib/ -laudiofile
 endif
 
-RUSTFLAGS	+= -C link-args="$(LIBAUDIOFILE)"
+RUSTFLAGS	+= -g -C link-args="$(LIBAUDIOFILE)"
 
 test:
 	rustc $(RUSTFLAGS) --cfg test audiofile.rs -o ./audiofile_test
