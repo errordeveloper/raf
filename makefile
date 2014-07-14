@@ -29,6 +29,6 @@ afapi.rs: bindgen
 		-I imports/audiofile/libaudiofile/ \
 		-match audiofile.h \
 		-match aupvlist.h \
+		-override-enum-type sint \
 		| sed 's/off_t/::libc::off_t/' \
-		| sed 's/\(^pub static .*: ::libc::c_\)u\(int = [0-9]*;$$\)/\1\2 \/\*_patched_\*\//' \
 	> $@
