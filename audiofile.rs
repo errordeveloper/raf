@@ -139,6 +139,7 @@ mod test {
       // RIFF (little-endian) data, WAVE audio, Microsoft ADPCM, mono 22050 Hz
   ];
 
+
   #[test]
   fn open_and_get_basic_info_with_low_level_calls() {
     ::with_readonly(path[0], |file| {
@@ -179,24 +180,6 @@ mod test {
       assert_eq!(::get_frame_count(file), 29016);
     });
 
-    ::with_readonly(path[2], |file| {
-      assert_eq!(::get_format(file), ::afapi::AF_FILE_CAF);
-      assert_eq!(::get_channels(file), 4);
-      assert!(::get_track_ids(file) != 0);
-
-      let (format, width) = ::get_sample_format(file);
-      // TODO:: replace this with pattern matching
-      assert_eq!(format, ::afapi::AF_SAMPFMT_TWOSCOMP);
-      assert_eq!(width, 24);
-
-      assert_eq!(::get_compression(file),
-              ::afapi::AF_COMPRESSION_ALAC);
-      assert_eq!(::get_byte_order(file),
-                 ::afapi::AF_BYTEORDER_LITTLEENDIAN);
-
-      assert_eq!(::get_rate(file), 44100.0)
-      assert_eq!(::get_frame_count(file), 220500);
-    });
 
     ::with_readonly(path[3], |file| {
       assert_eq!(::get_format(file), ::afapi::AF_FILE_IRCAM);
@@ -272,6 +255,29 @@ mod test {
 
       assert_eq!(::get_rate(file), 22050.0)
       assert_eq!(::get_frame_count(file), 102212);
+    });
+  }
+
+  #[cfg(target_os = "macos")]
+  #[test]
+  fn should_work_on_macos() {
+    ::with_readonly(path[2], |file| {
+      assert_eq!(::get_format(file), ::afapi::AF_FILE_CAF);
+      assert_eq!(::get_channels(file), 4);
+      assert!(::get_track_ids(file) != 0);
+
+      let (format, width) = ::get_sample_format(file);
+      // TODO:: replace this with pattern matching
+      assert_eq!(format, ::afapi::AF_SAMPFMT_TWOSCOMP);
+      assert_eq!(width, 24);
+
+      assert_eq!(::get_compression(file),
+              ::afapi::AF_COMPRESSION_ALAC);
+      assert_eq!(::get_byte_order(file),
+                 ::afapi::AF_BYTEORDER_LITTLEENDIAN);
+
+      assert_eq!(::get_rate(file), 44100.0)
+      assert_eq!(::get_frame_count(file), 220500);
     });
   }
 
