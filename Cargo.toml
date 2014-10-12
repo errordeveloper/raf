@@ -1,0 +1,12 @@
+[package]
+
+name = "raf"
+version = "0.0.1"
+authors = []
+tags = ["audio"]
+
+[lib]
+
+name = "raf"
+path = "audiofile.rs"
+

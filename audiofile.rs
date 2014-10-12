@@ -2,12 +2,13 @@
 #[phase(plugin, link)] extern crate log;
 
 extern crate libc;
-extern crate std;
+//extern crate std;
+extern crate native;
 
 //use std::result::result;
 //use std::io::{file, fs};
-use native::io::file::open;
-use std::rt::rtio::{Open, Read};
+//use native::io::file::open;
+//use std::rt::rtio::{Open, Read};
 
 #[allow(dead_code,
         unused_attribute,
